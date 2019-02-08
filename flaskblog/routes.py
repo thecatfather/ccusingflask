@@ -4,7 +4,7 @@ from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort ,jsonify
 from flaskblog import app, db, bcrypt, ma
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
-from flaskblog.models import User, Post, UserSchema
+from flaskblog.models import User, Post, Category, UserSchema ,CategorySchema
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -98,7 +98,7 @@ def account():
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data, author=current_user)
+        post = Post( content=form.content.data, author=current_user)
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
@@ -157,6 +157,9 @@ def user_posts(username):
 user_schema = UserSchema(strict=True)
 users_schema = UserSchema(many=True, strict=True)
 
+category_schema = CategorySchema(strict=True)
+categories_schema = CategorySchema(many=True, strict=True)
+
 @app.route("/api/v1/users", methods=['POST'])
 def add_user():
     username = request.json['username']
@@ -169,6 +172,8 @@ def add_user():
     db.session.commit()
 
     return user_schema.jsonify(new_user)
+
+
 
 @app.route('/api/v1/users', methods=['GET'])
 def get_users():
@@ -183,3 +188,16 @@ def delete_product(id):
   db.session.commit()
 
   return user_schema.jsonify(user)
+
+@app.route("/api/v1/categories", methods=['POST'])
+def add_category():
+    name = request.json['name']
+    #num_acts = request.json['num_acts']
+    #email = "default@default.com"
+    #print('user is = ' , username)
+    new_category = Category(name)
+
+    db.session.add(new_category)
+    db.session.commit()
+
+    return category_schema.jsonify(new_category)

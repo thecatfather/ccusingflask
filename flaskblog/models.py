@@ -17,21 +17,28 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=True)
     posts = db.relationship('Post', backref='author', lazy=True)
     #def __repr__(self):
-     #   return f"User('{self.username}', '{self.email}', '{self.image_file}')"
+    #   return f"User('{self.username}', '{self.email}', '{self.image_file}')"
     def __init__(self, username, email, password):
         self.username = username
         self.email = email
         self.password = password
 
 class UserSchema(ma.Schema):
-  class Meta:
-    fields = ('id', 'username', 'email', 'password')
+    class Meta:
+        fields = ('id', 'username', 'email', 'password')
 
 class Category(db.Model):
-	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.String(120), unique=True, nullable=False)
-	num_acts = db.Column(db.Integer, nullable=False)
-	posts = db.relationship('Post', backref='cat', lazy=True)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    num_acts = db.Column(db.Integer, nullable=True)
+    posts = db.relationship('Post', backref='cat', lazy=True)
+    def __init__(self, name):
+        self.name = name
+
+class CategorySchema(ma.Schema):
+    class Meta:
+        fields = ('name',)
+
     #def __repr__(self):
     #   return f"Category('{self.name}', '{self.num_acts}')"
 

@@ -1,9 +1,10 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField ,SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from flaskblog.models import User
+
+from flaskblog.models import User, Post, Category, UserSchema ,CategorySchema
 
 
 class RegistrationForm(FlaskForm):
@@ -57,6 +58,16 @@ class UpdateAccountForm(FlaskForm):
 
 
 class PostForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
+    #title = StringField('Title', validators=[DataRequired()])
     content = TextAreaField('Content', validators=[DataRequired()])
+    picture = FileField('Add Picture of act', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Post')
+    #category = SelectField(u'Category')
+
+def UpdateCategory(request):
+        cat = Category.query.all()
+        #print(cat)
+        listcat = [(i,i) for i in cat]
+        form = PostForm(request.POST)
+        form.category.choices=listcat
+
