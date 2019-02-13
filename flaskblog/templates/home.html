@@ -33,12 +33,22 @@ body {font-size:16px;}
   <div class="w3-bar-block">
     {% for cate in option_list %}
     <a href="{{url_for( 'category',cat=cate)}}" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">{{cate}}</a> {% endfor %}
+    <a href="{{url_for('new_post')}}" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Add a new Act</a>
+    <a href="{{url_for('new_cat')}}" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Add a new Category</a>
+    {% if current_user.is_authenticated %}
+    <a href="{{url_for('logout')}}" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Logout</a>
+    {% else %}
+    <a href="{{url_for('login')}}" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Login</a>
+    <a href="{{url_for('register')}}" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Sign-Up</a>
+    {% endif %}
+    
+
 <!--    <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Home</a> 
     <a href="save_nature.html" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Save Nature</a> 
     <a href="save_water.html" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Save Water</a> 
     <a href="protect_animals.html" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Protect Animals</a> 
     <a href="humanitarian_value.html" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Humanitarian values</a> -->
-    <a href="#contact" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Contact</a>
+   
   </div>
 </nav>
 
@@ -65,48 +75,18 @@ body {font-size:16px;}
   <div class="w3-row-padding">
     <div class="w3-half">
       <img src="{{url_for('static', filename='1.jpg')}}" width="500" height="300" onclick="onClick(this)" alt="Save Animals">
-      <i onclick="myFunction(this)" class="fa fa-thumbs-up"></i>
-
-      <script>
-      var likecount=0;  
-      function myFunction(x) {
-      x.classList.toggle("fa-thumbs-down");
-      like(this)
-      }
-      function like(y){
-        likecount++;
-
-      }
-      </script>
-
+      
 
       <img src="{{url_for('static', filename='2.jpg')}}" width="500" height="300"  onclick="onClick(this)" alt="Collect plastic from the woods">
-      <i onclick="myFunction(this)" class="fa fa-thumbs-up"></i>
-
-      <script>
-      function myFunction(x) {
-      x.classList.toggle("fa-thumbs-down");
-      }
-      </script>
+      
     </div>
 
     <div class="w3-half">
       <img src="{{url_for('static', filename='3.jpg')}}" width="500" height="300" onclick="onClick(this)" alt="keep our environment clean ">
-      <i onclick="myFunction(this)" class="fa fa-thumbs-up"></i>
-
-      <script>
-      function myFunction(x) {
-      x.classList.toggle("fa-thumbs-down");
-      }
-      </script>
+      
       <img src="{{url_for('static', filename='4.jpg')}}" width="500" height="300"  onclick="onClick(this)" alt="Plant more trees.">
-      <i onclick="myFunction(this)" class="fa fa-thumbs-up"></i>
-
-      <script>
-      function myFunction(x) {
-      x.classList.toggle("fa-thumbs-down");
-      }
-      </script>
+      
+      
   </div>
 
   <!-- Modal for full size images on click-->
@@ -151,25 +131,7 @@ body {font-size:16px;}
   </div>
   
   <!-- Contact -->
-  <div class="w3-container" id="contact" style="margin-top:75px">
-    <h1 class="w3-xxxlarge w3-text-red"><b>Contact.</b></h1>
-    <hr style="width:50px;border:5px solid red" class="w3-round">
-    <form action="/action_page.php" target="_blank">
-      <div class="w3-section">
-        <label>Name</label>
-        <input class="w3-input w3-border" type="text" name="Name" required>
-      </div>
-      <div class="w3-section">
-        <label>Email</label>
-        <input class="w3-input w3-border" type="text" name="Email" required>
-      </div>
-      <div class="w3-section">
-        <label>Message</label>
-        <input class="w3-input w3-border" type="text" name="Message" required>
-      </div>
-      <button type="submit" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Send Message</button>
-    </form>  
-  </div>
+  
 
 <!-- End page content -->
 </div>

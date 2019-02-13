@@ -59,9 +59,9 @@ class UpdateAccountForm(FlaskForm):
 
 class PostForm(FlaskForm):
     #title = StringField('Title', validators=[DataRequired()])
-    title = TextAreaField('title', validators=[DataRequired()])
-    content = TextAreaField('Content', validators=[DataRequired()])
-    picture = FileField('Update Profile Picture')
+    #title = TextAreaField('title', validators=[DataRequired()])
+    content = TextAreaField('Caption ', validators=[DataRequired()])
+    picture = FileField('Update Act Picture')
     submit = SubmitField('Post')
     category = SelectField(u'Category')
 
@@ -72,3 +72,6 @@ class PostForm(FlaskForm):
         form = PostForm(request.POST)
         form.category.choices=listcat"""
 
+class CategoryForm(FlaskForm):
+    name = TextAreaField('Name of category', validators=[DataRequired()])
+    submit = SubmitField('Add')

@@ -1,15 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
 
-<div class="content-section">
+<div class="content-section" style="position:absolute; right:300px; top:30px; height:100px; width:50%;">
     <form method="POST" action="" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <fieldset class="form-group">
             <legend class="border-bottom mb-4">{{ legend }}</legend>
 
-            <div class="form-group">
-                {{ form.title.label(class="form-control-label") }}
-                {{ form.title(class="form-control form-control-lg") }}
-                
-            </div>
             <div class="form-group">
                 {{ form.category.label(class="form-control-label") }}
                 {{ form.category(class="form-control form-control-lg") }}
@@ -47,3 +44,4 @@
         </div>
     </form>
 </div>
+{% endblock content %}

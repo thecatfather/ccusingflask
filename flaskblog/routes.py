@@ -3,7 +3,7 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort ,jsonify
 from flaskblog import app, db, bcrypt, ma
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm ,CategoryForm
 from flaskblog.models import User, Post, Category, UserSchema ,CategorySchema
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_wtf import Form
@@ -36,7 +36,7 @@ def home():
     l=[str(x[0]) for x in l]
     #print(l)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
-    return render_template('home.html', posts=post,option_list = l)
+    return render_template('home.html', posts=post,option_list = l,current_user=current_user)
 
 
 @app.route("/category/<string:cat>")
@@ -47,7 +47,10 @@ def category(cat):
     #print("this is filtered",filtered[0].image_file)
     image_list=[i.image_file for i in filtered]
     content_list=[i.content for i in filtered]
-    return render_template('category.html',image_list=image_list,content_list=content_list,category=cat)
+    id_list=[i.id for i in filtered]
+    likes_list=[i.upvotes for i in filtered]
+    #print(likes_list[0])
+    return render_template('category.html',current_user= current_user,image_list=image_list,content_list=content_list,category=cat, leng = len(image_list),id_list=id_list , likes_list= likes_list,post =filtered)
 
 @app.route("/about")
 def about():
@@ -93,7 +96,6 @@ def logout():
 
 
 
-
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
@@ -118,6 +120,32 @@ def account():
 
 #class UploadForm(Form):
    #file = FileField()
+@app.route('/like/<int:post_id>/<action>')
+@login_required
+def like_action(post_id, action):
+    post = Post.query.filter_by(id=post_id).first_or_404()
+    if action == 'like':
+        current_user.like_post(post)
+        db.session.commit()
+    if action == 'unlike':
+        current_user.unlike_post(post)
+        db.session.commit()
+    return redirect(request.referrer)
+
+@app.route("/post/new_cat", methods=['GET', 'POST'])
+@login_required
+def new_cat():
+
+    form = CategoryForm()
+    
+    if form.validate_on_submit():
+        cat = Category(form.name.data)
+        db.session.add(cat)
+        db.session.commit()
+        return redirect(url_for('home'))
+
+
+    return render_template('add_category.html',form=form ,legend='New Category')
 
 @app.route("/post/new", methods=['GET', 'POST'])
 @login_required
@@ -126,7 +154,7 @@ def new_post():
     #form2 = UploadForm()
     cat_names = db.session.query(Category.name)
     l = cat_names.all()
-    print(l[0][0])
+    #print(l[0][0])
     l=[str(x[0]) for x in l]
     print(l)
     form.category.choices = [ (i,i) for i in l]
@@ -137,7 +165,7 @@ def new_post():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
         print(picture_file)
-        post = Post(title=form.title.data, content=form.content.data, author=current_user, cat_name = form.category.data , image_file = picture_file)
+        post = Post( content=form.content.data, author=current_user, cat_name = form.category.data , image_file = picture_file)
         print("picture of data ", form.picture.data  )
 
         db.session.add(post)
@@ -187,7 +215,6 @@ def delete_post(post_id):
     db.session.commit()
     flash('Your post has been deleted!', 'success')
     return redirect(url_for('home'))
-
 
 @app.route("/user/<string:username>")
 def user_posts(username):
