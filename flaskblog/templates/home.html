@@ -31,11 +31,13 @@ body {font-size:16px;}
     <h3 class="w3-padding-64"><b>Services<br>Provided</b></h3>
   </div>
   <div class="w3-bar-block">
-    <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Home</a> 
+    {% for cate in option_list %}
+    <a href="{{url_for( 'category',cat=cate)}}" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">{{cate}}</a> {% endfor %}
+<!--    <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Home</a> 
     <a href="save_nature.html" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Save Nature</a> 
     <a href="save_water.html" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Save Water</a> 
     <a href="protect_animals.html" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Protect Animals</a> 
-    <a href="humanitarian_value.html" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Humanitarian values</a> 
+    <a href="humanitarian_value.html" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Humanitarian values</a> -->
     <a href="#contact" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Contact</a>
   </div>
 </nav>

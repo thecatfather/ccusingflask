@@ -6,15 +6,48 @@ from flaskblog import app, db, bcrypt, ma
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from flaskblog.models import User, Post, Category, UserSchema ,CategorySchema
 from flask_login import login_user, current_user, logout_user, login_required
+from flask_wtf import Form
+from flask_wtf.file import FileField
+from werkzeug import secure_filename
 
+
+def save_picture(form_picture):
+    print("hihihihi")
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/uploads', picture_fn)
+    print('PATH     ',os.path.join(app.root_path))
+
+    #output_size = (125, 125)
+    i = Image.open(form_picture)
+    #i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
 
 @app.route("/")
 @app.route("/home")
 def home():
     page = request.args.get('page', 1, type=int)
+    cat_names = db.session.query(Category.name)
+    l = cat_names.all()
+    #print(l[0][0])
+    l=[str(x[0]) for x in l]
+    #print(l)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
-    return render_template('home.html', posts=posts)
+    return render_template('home.html', posts=post,option_list = l)
 
+
+@app.route("/category/<string:cat>")
+def category(cat):
+    print(cat)
+    print(type(cat))
+    filtered = Post.query.filter(Post.cat_name == cat).order_by(Post.date_posted.desc()).all()
+    #print("this is filtered",filtered[0].image_file)
+    image_list=[i.image_file for i in filtered]
+    content_list=[i.content for i in filtered]
+    return render_template('category.html',image_list=image_list,content_list=content_list,category=cat)
 
 @app.route("/about")
 def about():
@@ -58,18 +91,7 @@ def logout():
     return redirect(url_for('home'))
 
 
-def save_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
 
-    output_size = (125, 125)
-    i = Image.open(form_picture)
-    i.thumbnail(output_size)
-    i.save(picture_path)
-
-    return picture_fn
 
 
 @app.route("/account", methods=['GET', 'POST'])
@@ -93,18 +115,40 @@ def account():
                            image_file=image_file, form=form)
 
 
+
+#class UploadForm(Form):
+   #file = FileField()
+
 @app.route("/post/new", methods=['GET', 'POST'])
 @login_required
 def new_post():
     form = PostForm()
+    #form2 = UploadForm()
+    cat_names = db.session.query(Category.name)
+    l = cat_names.all()
+    print(l[0][0])
+    l=[str(x[0]) for x in l]
+    print(l)
+    form.category.choices = [ (i,i) for i in l]
+    #l= Category.query.all()
+    #prin
     if form.validate_on_submit():
-        post = Post( content=form.content.data, author=current_user)
+        print("PICC ",form.picture.data)
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+        print(picture_file)
+        post = Post(title=form.title.data, content=form.content.data, author=current_user, cat_name = form.category.data , image_file = picture_file)
+        print("picture of data ", form.picture.data  )
+
         db.session.add(post)
         db.session.commit()
+
+
         flash('Your post has been created!', 'success')
         return redirect(url_for('home'))
+
     return render_template('create_post.html', title='New Post',
-                           form=form, legend='New Post')
+                           form=form, legend='New Post', option_list = l)
 
 
 @app.route("/post/<int:post_id>")
@@ -191,13 +235,19 @@ def delete_product(id):
 
 @app.route("/api/v1/categories", methods=['POST'])
 def add_category():
-    name = request.json['name']
+    name = request.json
     #num_acts = request.json['num_acts']
     #email = "default@default.com"
     #print('user is = ' , username)
-    new_category = Category(name)
+    new_category = Category(name[0])
 
     db.session.add(new_category)
     db.session.commit()
 
     return category_schema.jsonify(new_category)
+
+@app.route("/api/v1/categories", methods=['GET'])
+def get_categories():
+    all_users = Category.query.all()
+    result = categories_schema.dump(all_users)
+    return jsonify(result.data)

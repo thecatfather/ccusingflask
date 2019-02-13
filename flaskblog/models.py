@@ -28,8 +28,8 @@ class UserSchema(ma.Schema):
         fields = ('id', 'username', 'email', 'password')
 
 class Category(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True, nullable=False)
+    #id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False,primary_key=True)
     num_acts = db.Column(db.Integer, nullable=True)
     posts = db.relationship('Post', backref='cat', lazy=True)
     def __init__(self, name):
@@ -48,7 +48,7 @@ class Post(db.Model):
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     content = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    cat_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    cat_name = db.Column(db.Integer, db.ForeignKey('category.name'), nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     upvotes = db.Column(db.Integer)
     def __repr__(self):
