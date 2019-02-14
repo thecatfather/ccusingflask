@@ -10,6 +10,7 @@ from flask_wtf import Form
 from flask_wtf.file import FileField
 from werkzeug import secure_filename
 from sqlalchemy import select, func
+from datetime import datetime
 
 
 def save_picture(form_picture):
@@ -298,7 +299,8 @@ def upload_acts():
     userid = request.json['userid']
     content = request.json['caption']
     cat_name = request.json['categoryName']
-    post=Post(id1,content,userid,cat_name)
+
+    post=Post(id1,content,userid,datetime.utcnow(),cat_name, 0)
     db.session.add(post)
     db.session.commit()
     return post_schema.jsonify(post)  
@@ -313,15 +315,34 @@ def get_no_of_acts(categoryName):
     c=db.session.query(Post).filter_by(cat_name=categoryName).all()
     l = len(c)
     return "[" +str(l) + "]"
-'''@app.route("/api/v1/acts/upvote",methods=['POST'])
+@app.route("/api/v1/acts/upvote",methods=['POST'])
 def upvote():
     actid = request.json
-    id = Post(actid[0])
-    print(id)
-    up = Post.query.get(id)
-    s = up.upvotes
-    s = s + 1
-    up.upvotes = s
+    print(actid[0])
+    #id = Post(actid[0])
+    #print(id)
+    up = Post.query.get(actid[0])
+    up.n_upvotes = up.n_upvotes + 1
     db.session.commit()
-    return post_schema.jsonify(up)'''
+    return post_schema.jsonify(up)
+
+@app.route("/api/v1/acts/<actId>",methods=['DELETE'])
+def del_act(actId):
+    act = Post.query.get(actId)
+    db.session.delete(act)
+    db.session.commit()
+    return post_schema.jsonify(act)
+
+'''@app.route("/api/v1/categories/<categoryName>/acts?start=<startRange>&end=<endRange>",methods=['GET'])
+def range_acts(categoryName,startRange,endRange):
+    print("hihihihihihihihihihihihihih")
+    c=db.session.query(Post).filter_by(cat_name=categoryName).all()
+    print("hihihihihihihihihihihihihih",c)
+    #return "1"'''
+
+
+
+
+
+
 

@@ -75,18 +75,20 @@ class Post(db.Model):
     cat_name = db.Column(db.Integer, db.ForeignKey('category.name'), nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     upvotes = db.relationship('PostLike', backref='post', lazy='dynamic')
-
+    n_upvotes = db.Column(db.Integer, nullable=True, default = 0)
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}','{self.content}','{self.image_file}')"
 
-    def __init__(self,id,content,user_id, cat_name):
+    def __init__(self,id,content,user_id,date_posted, cat_name, n_upvotes):
         self.id = id
         self.content = content
         self.user_id = user_id
+        self.date_posted = date_posted
         self.cat_name = cat_name
+        self.n_upvotes = n_upvotes
         
 
 class PostSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'content', 'user_id', 'cat_name',)
+        fields = ('id', 'content', 'user_id', 'cat_name','n_upvotes','date_posted')
 
