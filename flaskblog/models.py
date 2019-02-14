@@ -79,5 +79,14 @@ class Post(db.Model):
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}','{self.content}','{self.image_file}')"
 
+    def __init__(self,id,content,user_id, cat_name):
+        self.id = id
+        self.content = content
+        self.user_id = user_id
+        self.cat_name = cat_name
+        
 
+class PostSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'content', 'user_id', 'cat_name',)
 

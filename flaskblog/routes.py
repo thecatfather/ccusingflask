@@ -4,11 +4,12 @@ from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort ,jsonify
 from flaskblog import app, db, bcrypt, ma
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm ,CategoryForm
-from flaskblog.models import User, Post, Category, UserSchema ,CategorySchema
+from flaskblog.models import User, Post, Category, UserSchema ,CategorySchema,PostSchema
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_wtf import Form
 from flask_wtf.file import FileField
 from werkzeug import secure_filename
+from sqlalchemy import select, func
 
 
 def save_picture(form_picture):
@@ -231,6 +232,9 @@ users_schema = UserSchema(many=True, strict=True)
 category_schema = CategorySchema(strict=True)
 categories_schema = CategorySchema(many=True, strict=True)
 
+post_schema = PostSchema(strict=True)
+posts_schema = PostSchema( many=True,strict=True)
+
 @app.route("/api/v1/users", methods=['POST'])
 def add_user():
     username = request.json['username']
@@ -278,3 +282,46 @@ def get_categories():
     all_users = Category.query.all()
     result = categories_schema.dump(all_users)
     return jsonify(result.data)
+
+@app.route("/api/v1/categories/<category_name>", methods=['DELETE'])
+def delete_category(category_name):
+    #print(category_name)
+    category = Category.query.get(category_name)
+    print(category)
+    db.session.delete(category)
+    db.session.commit()
+    return category_schema.jsonify(category)  
+      
+@app.route("/api/v1/acts", methods=['POST'])
+def upload_acts():
+    id1 = request.json['actId']
+    userid = request.json['userid']
+    content = request.json['caption']
+    cat_name = request.json['categoryName']
+    post=Post(id1,content,userid,cat_name)
+    db.session.add(post)
+    db.session.commit()
+    return post_schema.jsonify(post)  
+
+@app.route("/api/v1/categories/<categoryName>/acts", methods=['GET'])
+def get_acts(categoryName):
+    cate=db.session.query(Post).filter_by(cat_name=categoryName).all()
+    return posts_schema.jsonify(cate)
+
+@app.route("/api/v1/categories/<categoryName>/acts/size", methods=['GET'])
+def get_no_of_acts(categoryName):
+    c=db.session.query(Post).filter_by(cat_name=categoryName).all()
+    l = len(c)
+    return "[" +str(l) + "]"
+'''@app.route("/api/v1/acts/upvote",methods=['POST'])
+def upvote():
+    actid = request.json
+    id = Post(actid[0])
+    print(id)
+    up = Post.query.get(id)
+    s = up.upvotes
+    s = s + 1
+    up.upvotes = s
+    db.session.commit()
+    return post_schema.jsonify(up)'''
+
